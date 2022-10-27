@@ -106,7 +106,13 @@ class Modules extends Screen
     }
 
     public function newModule(Request $request, module $module) {
-        $module -> fill($request -> get('module')) -> save();
+        $count = $module::max('counter');
+        if (is_null($count))
+            $count = 1;
+        else
+            $count++;
+        $module -> fill(array_merge($request -> get('module'), ['counter' => $count]))
+            -> save();
 
         Toast::success('Модуль успешно добавлен!');
     }

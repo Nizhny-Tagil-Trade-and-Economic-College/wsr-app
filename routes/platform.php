@@ -7,6 +7,7 @@ use App\Orchid\Screens\Role\RoleListScreen;
 use App\Orchid\Screens\User\UserEditScreen;
 use App\Orchid\Screens\User\UserListScreen;
 use App\Orchid\Screens\User\UserProfileScreen;
+use App\Orchid\Screens\WSR\Check;
 use App\Orchid\Screens\WSR\Modules;
 use App\Orchid\Screens\WSR\Persons;
 use Illuminate\Support\Facades\Route;
@@ -39,3 +40,6 @@ Route::screen('profile', UserProfileScreen::class)
 // Modules
 Route::screen('modules', Modules::class)
     -> name('platform.modules');
+// Check
+Route::screen('check', Check::class)
+    -> name('platform.check');

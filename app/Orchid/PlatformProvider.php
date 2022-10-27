@@ -32,7 +32,8 @@ class PlatformProvider extends OrchidServiceProvider
                 -> icon('people')
                 -> route('platform.main'),
             Menu::make('Проверка работ')
-                -> icon('code'),
+                -> icon('code')
+                -> route('platform.check'),
             Menu::make('Модули')
                 -> icon('modules')
                 -> route('platform.modules'),

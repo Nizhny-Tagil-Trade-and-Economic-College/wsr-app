@@ -29,6 +29,7 @@ class Modules extends Table
     {
         return [
             TD::make('name', 'Имя модуля'),
+            TD::make('counter', 'Номер модуля'),
             TD::make('is_active', 'Активный модуль')
                 -> render(function(module $module) {
                     return CheckBox::make("mod[{$module -> id}]")
