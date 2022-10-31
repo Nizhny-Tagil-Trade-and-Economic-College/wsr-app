@@ -135,24 +135,22 @@ class Modules extends Screen
         $module -> fill(array_merge($request -> get('module'), ['counter' => $count]))
             -> save();
 
-        if (!empty($persons::all())) {
-            foreach ($persons::all() as $person) {
-                DB::statement("CREATE DATABASE {$person -> login}_m{$count};");
-                DB::statement("GRANT ALL PRIVILEGES ON {$person -> login}_m{$count}.* TO '{$person -> login}'@'%';");
-                exec("/usr/bin/sudo /usr/bin/mkdir {$person -> home}/m{$count};");
-                exec("/usr/bin/sudo /usr/bin/chown -R {$person -> login}:{$person -> login} {$person -> home}; /usr/bin/sudo /usr/bin/chmod -R 777 {$person -> home}");
-                exec("/usr/bin/sudo /bin/bash -c '/usr/bin/echo -e \"<VirtualHost *:80>\n\tServerName {$person -> login}-m{$count}.wsr.ru\n\tDocumentRoot {$person -> home}/m{$count}\n\t# AssignUserId {$person -> login} www-data\n\t<Directory {$person -> home}/m{$count}>\n\t\tOptions +Indexes +FollowSymLinks +MultiViews +ExecCGI\n\t\tOrder allow,deny\n\t\tAllow from all\n\t\tRequire all granted\n\t\tAllowOverride All\n\t</Directory>\n\tAddHandler cgi-script .py\n\tErrorLog {$person -> home}/m{$count}/error.log\n\tCustomLog {$person -> home}/m{$count}/access.log combined\n</VirtualHost>\" > /etc/apache2/sites-enabled/{$person -> login}-m{$count}.conf'");
-            }
-            DB::statement('FLUSH PRIVILEGES;');
-            exec('/usr/bin/sudo /usr/sbin/service apache2 reload');
-
-            $host_ip = getenv('HOST_IP');
-            $bind_conf = "\\\$TTL  604800\\n@ IN  SOA ns.wsr.ru. admin.wsr.ru. (\\n3         ; Serial\\n604800    ; Refresh\\n86400     ; Retry\\n2419200   ; Expire\\n604800 )  ; Negative Cache TTL\\n; DNS Servers\\n@  IN  NS  ns.wsr.ru.\\n@  IN  A   {$host_ip}\\nns IN  A   {$host_ip}\\npma IN  A   {$host_ip}\\n; A list for users\\n";
-            foreach($person -> all() as $p)
-                foreach($module -> all() as $m)
-                    $bind_conf .= "{$p -> login}-m{$m -> counter} IN A {$host_ip}\\n";
-            exec("/usr/bin/sudo /bin/bash -c '/usr/bin/echo -e \"{$bind_conf}\" > /server/config/bind/db.wsr.ru'");
+        foreach ($persons::all() as $person) {
+            DB::statement("CREATE DATABASE {$person -> login}_m{$count};");
+            DB::statement("GRANT ALL PRIVILEGES ON {$person -> login}_m{$count}.* TO '{$person -> login}'@'%';");
+            exec("/usr/bin/sudo /usr/bin/mkdir {$person -> home}/m{$count};");
+            exec("/usr/bin/sudo /usr/bin/chown -R {$person -> login}:{$person -> login} {$person -> home}; /usr/bin/sudo /usr/bin/chmod -R 777 {$person -> home}");
+            exec("/usr/bin/sudo /bin/bash -c '/usr/bin/echo -e \"<VirtualHost *:80>\n\tServerName {$person -> login}-m{$count}.wsr.ru\n\tDocumentRoot {$person -> home}/m{$count}\n\t# AssignUserId {$person -> login} www-data\n\t<Directory {$person -> home}/m{$count}>\n\t\tOptions +Indexes +FollowSymLinks +MultiViews +ExecCGI\n\t\tOrder allow,deny\n\t\tAllow from all\n\t\tRequire all granted\n\t\tAllowOverride All\n\t</Directory>\n\tAddHandler cgi-script .py\n\tErrorLog {$person -> home}/m{$count}/error.log\n\tCustomLog {$person -> home}/m{$count}/access.log combined\n</VirtualHost>\" > /etc/apache2/sites-enabled/{$person -> login}-m{$count}.conf'");
         }
+        DB::statement('FLUSH PRIVILEGES;');
+        exec('/usr/bin/sudo /usr/sbin/service apache2 reload');
+
+        $host_ip = getenv('HOST_IP');
+        $bind_conf = "\\\$TTL  604800\\n@ IN  SOA ns.wsr.ru. admin.wsr.ru. (\\n3         ; Serial\\n604800    ; Refresh\\n86400     ; Retry\\n2419200   ; Expire\\n604800 )  ; Negative Cache TTL\\n; DNS Servers\\n@  IN  NS  ns.wsr.ru.\\n@  IN  A   {$host_ip}\\nns IN  A   {$host_ip}\\npma IN  A   {$host_ip}\\n; A list for users\\n";
+        foreach($persons::all() as $p)
+            foreach($module::all() as $m)
+                $bind_conf .= "{$p -> login}-m{$m -> counter} IN A {$host_ip}\\n";
+        exec("/usr/bin/sudo /bin/bash -c '/usr/bin/echo -e \"{$bind_conf}\" > /server/config/bind/db.wsr.ru'");
 
         Toast::success('Модуль успешно добавлен!');
     }
