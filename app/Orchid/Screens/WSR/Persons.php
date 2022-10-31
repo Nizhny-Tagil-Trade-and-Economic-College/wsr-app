@@ -108,7 +108,7 @@ class Persons extends Screen
             exec("/usr/bin/sudo /usr/sbin/useradd -m -d {$user['home']} -s /bin/bash -U {$user['login']} -p `/usr/bin/openssl passwd {$user['raw_password']}`; /usr/bin/sudo /usr/sbin/usermod -aG {$user['login']}");
             DB::statement("CREATE USER IF NOT EXISTS '{$user['login']}'@'%' IDENTIFIED BY '{$user['raw_password']}';");
             foreach ($modules -> all() as $module) {
-                exec("/usr/bin/sudo /usr/bin/mkdir {$user['home']}/m{$module -> counter};");
+                exec("/usr/bin/sudo /usr/bin/mkdir {$user['home']}/m{$module -> counter}; /usr/bin/sudo /usr/bin/chown -R www-data:www-data {$user['home']}/m{$module -> counter}; /usr/bin/sudo /usr/bin/chmod -R 777 {$user['home']}/m{$module -> counter};");
                 exec("/usr/bin/sudo /bin/bash -c '/usr/bin/echo -e \"<VirtualHost *:80>\n\tServerName {$user['login']}-m{$module -> counter}.wsr.ru\n\tDocumentRoot {$user['home']}/m{$module -> counter}\n\t# AssignUserId {$user['login']} www-data\n\t<Directory {$user['home']}/m{$module -> counter}>\n\t\tOptions +Indexes +FollowSymLinks +MultiViews +ExecCGI\n\t\tOrder allow,deny\n\t\tAllow from all\n\t\tRequire all granted\n\t\tAllowOverride All\n\t</Directory>\n\tAddHandler cgi-script .py\n\tErrorLog {$user['home']}/m{$module -> counter}/error.log\n\tCustomLog {$user['home']}/m{$module -> counter}/access.log combined\n</VirtualHost>\" > /etc/apache2/sites-enabled/{$user['login']}-m{$module -> counter}.conf'");
                 DB::statement("CREATE DATABASE {$user['login']}_m{$module -> counter};");
                 DB::statement("GRANT ALL PRIVILEGES ON {$user['login']}_m{$module -> counter}.* TO '{$user['login']}'@'%';");
