@@ -123,7 +123,7 @@ class Persons extends Screen
             foreach($person -> all() as $p)
                 foreach($modules -> all() as $m)
                     $bind_conf .= "{$p -> login}-m{$m -> counter} IN A {$host_ip}\\n";
-            exec("/usr/bin/sudo /bin/bash -c '/usr/bin/echo -e \"{$bind_conf}\" > /server/config/bind/db.wsr.ru'", $o, $r);
+            exec("/usr/bin/sudo /bin/bash -c '/usr/bin/echo -e \"{$bind_conf}\" > /server/config/bind/db.wsr.ru'");
 
             Toast::success('Пользователь успешно добавлен!');
         } else Toast::warning('Вы не можете добавить уже имеющегося участника!');
